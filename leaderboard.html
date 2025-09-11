@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoEvolution - Leaderboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1a202c;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #2d3748;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #4a5568;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #10b981;
+    }
+
+    .leaderboard-container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #2d3748;
+      border-radius: 1rem;
+      border: 1px solid #4a5568;
+    }
+
+    h1 {
+      text-align: center;
+      color: #10b981;
+      margin-bottom: 2rem;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    select {
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #4a5568;
+      background: #1f2937;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    select:focus {
+      border-color: #10b981;
+      outline: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid #4a5568;
+    }
+
+    th {
+      background-color: #1f2937;
+      color: #10b981;
+    }
+
+    tr:hover {
+      background-color: #374151;
+    }
+
+    .rank {
+      font-weight: bold;
+      color: #10b981;
+    }
+
+    .points {
+      font-weight: bold;
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">🌱 EcoEvolution</div>
+  </header>
+
+  <div class="leaderboard-container">
+    <h1>Leaderboard</h1>
+
+    <div class="filters">
+      <select id="stateSelect">
+        <option value="">Select State</option>
+      </select>
+      <select id="municipalitySelect" disabled>
+        <option value="">Select Municipality</option>
+      </select>
+      <select id="wardSelect" disabled>
+        <option value="">Select Ward</option>
+      </select>
+    </div>
+
+    <table id="leaderboardTable">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="3" style="text-align:center;">Select filters to view leaderboard</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Sample leaderboard data
+    const leaderboardData = {
+      "West Bengal": {
+        "Kolkata": {
+          "Ward 12": [
+            { name: "Team Green", points: 980 },
+            { name: "Clean Champs", points: 860 },
+            { name: "Ward Warriors", points: 720 }
+          ],
+          "Ward 18": [
+            { name: "Eco Squad", points: 900 },
+            { name: "Waste Busters", points: 750 }
+          ]
+        },
+        "Howrah": {
+          "Ward 5": [
+            { name: "River Savers", points: 1000 },
+            { name: "Howrah Heroes", points: 870 }
+          ]
+        }
+      },
+      "Maharashtra": {
+        "Mumbai": {
+          "Ward A": [
+            { name: "Mumbai Recyclers", points: 1100 },
+            { name: "Eco Mumbai", points: 950 }
+          ]
+        }
+      }
+    };
+
+    const stateSelect = document.getElementById("stateSelect");
+    const municipalitySelect = document.getElementById("municipalitySelect");
+    const wardSelect = document.getElementById("wardSelect");
+    const leaderboardTable = document.getElementById("leaderboardTable").querySelector("tbody");
+
+    // Populate states
+    for (let state in leaderboardData) {
+      const option = document.createElement("option");
+      option.value = state;
+      option.textContent = state;
+      stateSelect.appendChild(option);
+    }
+
+    stateSelect.addEventListener("change", () => {
+      municipalitySelect.innerHTML = "<option value=''>Select Municipality</option>";
+      wardSelect.innerHTML = "<option value=''>Select Ward</option>";
+      leaderboardTable.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Select filters to view leaderboard</td></tr>";
+
+      if (stateSelect.value) {
+        municipalitySelect.disabled = false;
+        const municipalities = leaderboardData[stateSelect.value];
+        for (let muni in municipalities) {
+          const option = document.createElement("option");
+          option.value = muni;
+          option.textContent = muni;
+          municipalitySelect.appendChild(option);
+        }
+      } else {
+        municipalitySelect.disabled = true;
+        wardSelect.disabled = true;
+      }
+    });
+
+    municipalitySelect.addEventListener("change", () => {
+      wardSelect.innerHTML = "<option value=''>Select Ward</option>";
+      leaderboardTable.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Select filters to view leaderboard</td></tr>";
+
+      if (municipalitySelect.value) {
+        wardSelect.disabled = false;
+        const wards = leaderboardData[stateSelect.value][municipalitySelect.value];
+        for (let ward in wards) {
+          const option = document.createElement("option");
+          option.value = ward;
+          option.textContent = ward;
+          wardSelect.appendChild(option);
+        }
+      } else {
+        wardSelect.disabled = true;
+      }
+    });
+
+    wardSelect.addEventListener("change", () => {
+      if (wardSelect.value) {
+        const leaderboard = leaderboardData[stateSelect.value][municipalitySelect.value][wardSelect.value];
+        leaderboardTable.innerHTML = "";
+        leaderboard
+          .sort((a, b) => b.points - a.points)
+          .forEach((entry, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td class="rank">#${index + 1}</td>
+              <td>${entry.name}</td>
+              <td class="points">${entry.points}</td>
+            `;
+            leaderboardTable.appendChild(row);
+          });
+      }
+    });
+  </script>
+</body>
+</html>

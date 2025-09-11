@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera Upload with Live Date & Location</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    background: #0f1f13; /* Dark greenish black */
+    color: #fff;
+  }
+  canvas {
+    border: 2px solid #0a5c2d;
+    border-radius: 10px;
+    background: #0f1f13; /* dark greenish black behind video */
+    max-width: 100%;
+  }
+  button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0a5c2d; /* greenish button */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button:hover { background-color: #058037; }
+</style>
+</head>
+<body>
+
+<h2>Capture Photo with Live Timestamp & Location</h2>
+<canvas id="canvas"></canvas>
+<button id="snap">Capture & Upload</button>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const snapBtn = document.getElementById('snap');
+
+let latitude = null;
+let longitude = null;
+
+// Get location
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      latitude = pos.coords.latitude.toFixed(5);
+      longitude = pos.coords.longitude.toFixed(5);
+      console.log("Location captured:", latitude, longitude);
+    },
+    (err) => {
+      alert("Location access denied. Timestamp will still appear.");
+    }
+  );
+} else {
+  alert("Geolocation not supported by your browser.");
+}
+
+// Access camera
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
+  .then(stream => {
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.play();
+
+    video.addEventListener('loadedmetadata', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      function drawFrame() {
+        // Draw video
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Overlay semi-transparent dark greenish black background for timestamp
+        const overlayHeight = 40;
+        ctx.fillStyle = "rgba(15, 31, 19, 0.6)"; 
+        ctx.fillRect(0, canvas.height - overlayHeight, canvas.width, overlayHeight);
+
+        // Draw timestamp & location
+        const now = new Date();
+        const timestamp = now.toLocaleString();
+        const text = latitude && longitude ? `${timestamp} | ${latitude}, ${longitude}` : timestamp;
+
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "yellow";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.strokeText(text, 10, canvas.height - 10);
+        ctx.fillText(text, 10, canvas.height - 10);
+
+        requestAnimationFrame(drawFrame);
+      }
+      drawFrame();
+    });
+  })
+  .catch(err => { alert("Camera access denied!"); console.error(err); });
+
+// Capture button
+snapBtn.addEventListener('click', () => {
+  canvas.toBlob(blob => {
+    console.log("Image ready to upload:", blob);
+    alert("Image captured with timestamp and location (check console for blob).");
+    // Send `blob` to server using fetch or XMLHttpRequest
+  }, 'image/jpeg', 0.95);
+});
+</script>
+
+</body>
+</html>

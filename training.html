@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Learn • EcoTrack — Learning Roadmap</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .card-shadow{ box-shadow: 0 6px 18px rgba(15,23,42,0.06); }
+  .locked { filter: grayscale(.8); opacity:.6; }
+  .progress-track { background: linear-gradient(90deg,#10b981,#3b82f6); height:8px; border-radius:9999px; }
+  .modal-backdrop{ background: rgba(2,6,23,.6); }
+  .modal-close { font-size:1.2rem; font-weight:bold; cursor:pointer; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+<div class="max-w-4xl mx-auto p-6">
+  <header class="flex items-center gap-4 mb-6">
+    <div class="w-14 h-14 rounded-full bg-emerald-500 grid place-items-center text-white text-xl font-bold">📘</div>
+    <div>
+      <h1 class="text-2xl font-extrabold">Learning Roadmap</h1>
+      <p class="text-sm text-slate-500">Watch short videos to master recycling basics — quizzes unlock the next lesson. Earn points based on correct answers.</p>
+    </div>
+  </header>
+
+  <!-- Summary / Progress -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="col-span-2 p-4 rounded-lg bg-white card-shadow flex items-center justify-between">
+      <div>
+        <p class="text-sm text-slate-500">Your Points</p>
+        <p id="points" class="text-2xl font-bold text-amber-500">0</p>
+      </div>
+      <div style="min-width:220px">
+        <p class="text-sm text-slate-500">Progress <span id="percent">0%</span></p>
+        <div class="w-full mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
+          <div id="progressBar" class="progress-track" style="width:0%"></div>
+        </div>
+        <p class="text-xs text-slate-400 mt-1" id="completedText">0 of 5 lessons completed</p>
+      </div>
+    </div>
+    <div class="p-4 rounded-lg bg-white card-shadow">
+      <h3 class="text-sm font-semibold">Continue Learning</h3>
+      <p class="text-xs text-slate-500" id="continueLessonText"></p>
+      <div class="mt-3">
+        <button id="continueBtn" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-emerald-500 text-white font-semibold">Start Now ➜</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lessons list -->
+  <section class="space-y-4">
+    <div id="lessons" class="space-y-3"></div>
+  </section>
+
+  <footer class="mt-8 text-xs text-slate-400">Tip: Watch video and take quiz to unlock the next lesson. Progress is saved in your browser.</footer>
+</div>
+
+<!-- Video Modal -->
+<div id="modal" class="fixed inset-0 hidden items-center justify-center z-50">
+  <div class="absolute inset-0 modal-backdrop"></div>
+  <div class="relative w-full max-w-3xl mx-4 bg-white rounded-lg overflow-hidden">
+    <div class="flex items-center justify-between p-3 border-b">
+      <h3 id="modalTitle" class="font-semibold">Lesson</h3>
+      <span id="closeModal" class="modal-close">×</span>
+    </div>
+    <div class="p-4 bg-black/90">
+      <video id="lessonVideo" controls style="width:100%; height:420px; background:#000">
+        <source id="videoSource" src="videos/lesson1.mp4" type="video/mp4">
+        Your browser doesn't support HTML5 video. You can <a id="videoLink" href="#">open the video in a new tab</a>.
+      </video>
+      <button id="takeQuiz" class="mt-3 px-3 py-1 rounded bg-emerald-500 text-white w-full">Take Quiz</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz Modal -->
+<div id="quizModal" class="fixed inset-0 hidden items-center justify-center z-50">
+  <div class="absolute inset-0 modal-backdrop"></div>
+  <div class="relative w-full max-w-3xl mx-4 bg-white rounded-lg overflow-hidden p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 id="quizTitle" class="font-semibold text-lg">Quiz</h3>
+      <span id="closeQuiz" class="modal-close cursor-pointer text-xl font-bold">×</span>
+    </div>
+    <div class="flex justify-between items-center mb-2">
+      <span id="quizTimer" class="text-sm font-semibold text-red-500">Time Left: 60s</span>
+    </div>
+    <div id="quizContent" class="space-y-4"></div>
+  </div>
+</div>
+
+<script>
+const lessonsData = [
+  { id:1, title:'Lesson 1: Introduction', desc:'Why recycling matters', points:100, videoSrc:'videos/lesson1.mp4', unlocked:true, watched:false },
+  { id:2, title:'Lesson 2: Sorting Waste', desc:'How to separate recyclables', points:100, videoSrc:'videos/lesson2.mp4', unlocked:false, watched:false },
+  { id:3, title:'Lesson 3: Composting', desc:'Turn kitchen scraps into soil', points:100, videoSrc:'videos/lesson3.mp4', unlocked:false, watched:false },
+  { id:4, title:'Lesson 4: Reducing Plastic', desc:'Cut single-use plastics', points:100, videoSrc:'videos/lesson4.mp4', unlocked:false, watched:false },
+  { id:5, title:'Lesson 5: Energy Saving', desc:'Small habits to save energy', points:100, videoSrc:'videos/lesson5.mp4', unlocked:false, watched:false }
+];
+
+// Example: Quiz data per lesson (7 questions, 4 options each)
+const quizzes = {
+  1: [
+    { q:"Why is recycling important?", options:["Saves resources","Wastes time","Costs money","No effect"], answer:0 },
+    { q:"Which can be recycled?", options:["Plastic","Glass","Paper","All of the above"], answer:3 },
+    { q:"Recycling reduces ...?", options:["Pollution","Income","Sleep","Traffic"], answer:0 },
+    { q:"Which color bin is for paper?", options:["Blue","Green","Red","Yellow"], answer:0 },
+    { q:"Composting is ...?", options:["Food waste to soil","Throwing trash","Burning waste","Watering plants"], answer:0 },
+    { q:"Single-use plastics include?", options:["Bags","Bottles","Straws","All of the above"], answer:3 },
+    { q:"Recycling helps environment by ...?", options:["Saving trees","Increasing waste","Polluting water","No effect"], answer:0 }
+  ],
+  2: [
+    { q:"First step in sorting?", options:["Separate recyclables","Throw all in trash","Burn","Ignore"], answer:0 },
+    { q:"Plastic bottles go in?", options:["Blue bin","Green bin","Red bin","Yellow bin"], answer:0 },
+    { q:"Glass bottles go in?", options:["Blue","Green","Red","Yellow"], answer:2 },
+    { q:"Food waste can be?", options:["Composted","Landfill only","Burned","Thrown away"], answer:0 },
+    { q:"Sorting helps?", options:["Recycle efficiently","Waste money","Nothing","Increase pollution"], answer:0 },
+    { q:"Paper recycling requires ...?", options:["Dry paper","Wet paper","Plastic","Glass"], answer:0 },
+    { q:"Metal cans go in?", options:["Blue bin","Green bin","Red bin","Yellow bin"], answer:0 }
+  ]
+  // Repeat for lessons 3, 4, 5...
+};
+
+let state = { lessons: lessonsData };
+let currentLessonId = null, currentQuizAnswers=[], currentQuestionIndex=0, timerInterval=null;
+
+// Elements
+const lessonsEl = document.getElementById('lessons');
+const pointsEl = document.getElementById('points');
+const progressBar = document.getElementById('progressBar');
+const percentEl = document.getElementById('percent');
+const completedText = document.getElementById('completedText');
+const continueBtn = document.getElementById('continueBtn');
+const continueLessonText = document.getElementById('continueLessonText');
+const modal = document.getElementById('modal');
+const lessonVideo = document.getElementById('lessonVideo');
+const videoSource = document.getElementById('videoSource');
+const closeModal = document.getElementById('closeModal');
+const takeQuiz = document.getElementById('takeQuiz');
+const quizModal = document.getElementById('quizModal');
+const quizContent = document.getElementById('quizContent');
+const closeQuiz = document.getElementById('closeQuiz');
+const quizTimer = document.getElementById('quizTimer');
+
+// Render lessons
+function renderLessons(){
+  lessonsEl.innerHTML = '';
+  state.lessons.forEach((l,idx)=>{
+    const locked = !l.unlocked;
+    const li = document.createElement('div');
+    li.className = `p-4 bg-white rounded-lg card-shadow flex items-center justify-between gap-4` + (locked?' locked':'');
+    li.innerHTML = `
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center bg-slate-100 text-slate-600 font-bold">${idx+1}</div>
+        <div>
+          <h4 class="font-semibold">${l.title}</h4>
+          <p class="text-xs text-slate-400">${l.desc}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-sm text-slate-400">${l.points} pts</div>
+        <div>
+          ${locked
+            ? `<button class="px-3 py-1 rounded bg-slate-100 text-slate-400" disabled>🔒</button>`
+            : `<button data-lesson="${l.id}" class="openBtn px-3 py-1 rounded bg-emerald-500 text-white">Start</button>`}
+        </div>
+      </div>
+    `;
+    lessonsEl.appendChild(li);
+  });
+
+  const nextLesson = state.lessons.find(x=> x.unlocked && !x.watched) || state.lessons[state.lessons.length-1];
+  continueLessonText.textContent = nextLesson.title;
+  continueBtn.onclick = ()=> openLesson(nextLesson.id);
+
+  document.querySelectorAll('.openBtn').forEach(b=> b.addEventListener('click', e=> openLesson(Number(e.currentTarget.dataset.lesson))));
+
+  const completedCount = state.lessons.filter(x=>x.watched).length;
+  const total = state.lessons.length;
+  const percent = Math.round((completedCount/total)*100);
+  progressBar.style.width = percent+'%';
+  percentEl.textContent = percent+'%';
+  completedText.textContent = `${completedCount} of ${total} lessons completed`;
+  pointsEl.textContent = state.lessons.filter(x=>x.watched).reduce((s,n)=>s+n.points,0);
+}
+
+// Open lesson
+function openLesson(id){
+  const lesson = state.lessons.find(x=>x.id===id);
+  if(!lesson || !lesson.unlocked) return;
+  currentLessonId = id;
+  modal.classList.remove('hidden'); modal.classList.add('flex');
+  videoSource.src = lesson.videoSrc;
+  lessonVideo.load();
+}
+function closeLessonModal(){ modal.classList.add('hidden'); modal.classList.remove('flex'); }
+closeModal.addEventListener('click', closeLessonModal);
+takeQuiz.addEventListener('click', ()=> showQuiz(currentLessonId));
+lessonVideo.addEventListener('ended', ()=> showQuiz(currentLessonId));
+
+// Quiz with timer
+function showQuiz(lessonId){
+  const questions = quizzes[lessonId];
+  if(!questions) return alert("No quiz for this lesson");
+  currentLessonId = lessonId;
+  currentQuizAnswers = new Array(questions.length).fill(null);
+  currentQuestionIndex = 0;
+  quizModal.classList.remove('hidden'); quizModal.classList.add('flex');
+  startTimer(60);
+  showQuestion();
+}
+
+function startTimer(seconds){
+  let timeLeft = seconds;
+  quizTimer.textContent = `Time Left: ${timeLeft}s`;
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    quizTimer.textContent = `Time Left: ${timeLeft}s`;
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      alert("Time's up!");
+      calculateQuizResult();
+    }
+  },1000);
+}
+
+function showQuestion(){
+  const questions = quizzes[currentLessonId];
+  const q = questions[currentQuestionIndex];
+  quizContent.innerHTML = `
+    <p class="font-semibold">${currentQuestionIndex+1}. ${q.q}</p>
+    ${q.options.map((opt,i)=>`
+      <label class="block ml-4 mt-2 cursor-pointer">
+        <input type="radio" name="q${currentQuestionIndex}" value="${i}"> ${opt}
+      </label>`).join('')}
+    <button id="nextQuestion" class="mt-3 px-4 py-2 rounded bg-emerald-500 text-white">Next</button>
+  `;
+  document.getElementById('nextQuestion').addEventListener('click', ()=>{
+    const selected = document.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
+    if(!selected){ alert("Select an answer"); return; }
+    currentQuizAnswers[currentQuestionIndex] = Number(selected.value);
+    if(currentQuestionIndex+1 < questions.length) currentQuestionIndex++, showQuestion();
+    else calculateQuizResult();
+  });
+}
+
+function calculateQuizResult(){
+  clearInterval(timerInterval);
+  const questions = quizzes[currentLessonId];
+  let correctCount=0;
+  questions.forEach((q,i)=>{ if(currentQuizAnswers[i]===q.answer) correctCount++; });
+  const scorePercent = Math.round((correctCount/questions.length)*100);
+  const lesson = state.lessons.find(x=>x.id===currentLessonId);
+  lesson.watched = scorePercent>=50;
+  lesson.points = Math.round((correctCount/questions.length)*lesson.points);
+  const nextIdx = state.lessons.findIndex(x=>x.id===currentLessonId)+1;
+  if(state.lessons[nextIdx] && scorePercent>=50) state.lessons[nextIdx].unlocked = true;
+  renderLessons();
+  alert(`You scored ${scorePercent}%. ${scorePercent>=50? "Next lesson unlocked!":"Try again."}`);
+  closeQuizModal(); closeLessonModal();
+}
+
+function closeQuizModal(){
+  clearInterval(timerInterval);
+  quizModal.classList.add('hidden'); quizModal.classList.remove('flex');
+}
+closeQuiz.addEventListener('click', closeQuizModal);
+
+renderLessons();
+</script>
+
+
+</body>
+</html>

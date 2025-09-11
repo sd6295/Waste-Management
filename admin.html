@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Government Admin Panel</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background: #121212;
+      color: #f0f0f0;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #1e1e1e;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar h2 {
+      color: #00b894;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .sidebar a {
+      color: #f0f0f0;
+      text-decoration: none;
+      padding: 12px;
+      display: block;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background: #00b894;
+      color: #121212;
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      transition: transform 0.3s;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .card h3 { margin-bottom: 15px; color: #00cec9; }
+
+    canvas, #map {
+      width: 100%;
+      height: 300px;
+      border-radius: 12px;
+    }
+
+    /* Verification Section */
+    .verification table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .verification th, .verification td {
+      padding: 10px;
+      border-bottom: 1px solid #333;
+      text-align: left;
+    }
+    .verification button {
+      background: #00b894;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      transition: 0.3s;
+    }
+    .verification button:hover {
+      background: #019875;
+    }
+
+    /* Responsive */
+    @media(max-width:768px){
+      .sidebar{width: 70px;}
+      .sidebar h2{display: none;}
+      .sidebar a{padding: 10px; font-size: 12px; text-align: center;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>EcoGov</h2>
+    <a href="#" class="active" onclick="showSection('dashboard')">Dashboard</a>
+    <a href="#" onclick="showSection('complaints')">Complaints</a>
+    <a href="#" onclick="showSection('workers')">Workers</a>
+    <a href="#" onclick="showSection('analytics')">Analytics</a>
+    <a href="#" onclick="showSection('training')">Training</a>
+    <a href="#" onclick="showSection('marketplace')">Marketplace</a>
+    <a href="#" onclick="showSection('leaderboard')">Leaderboard</a>
+    <a href="#" onclick="showSection('verification')">Verification</a>
+    <a href="#" onclick="showSection('settings')">Settings</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Dashboard -->
+    <div id="dashboard" class="section active">
+      <h1>Dashboard Overview</h1>
+      <div class="cards">
+        <div class="card"><h3>Total Complaints</h3><canvas id="complaintChart"></canvas></div>
+        <div class="card"><h3>Worker Performance</h3><canvas id="workerChart"></canvas></div>
+        <div class="card"><h3>Municipality Coverage</h3><div id="map"></div></div>
+      </div>
+    </div>
+
+    <!-- Complaints -->
+    <div id="complaints" class="section">
+      <h1>Complaints Management</h1>
+      <div class="cards">
+        <div class="card"><h3>Pending Complaints</h3><p>45 cases waiting for action.</p></div>
+        <div class="card"><h3>Escalated Complaints</h3><p>15 cases require admin review.</p></div>
+        <div class="card"><h3>Resolved This Week</h3><p>120 complaints cleared successfully.</p></div>
+      </div>
+    </div>
+
+    <!-- Workers -->
+    <div id="workers" class="section">
+      <h1>Worker Management</h1>
+      <div class="cards">
+        <div class="card"><h3>Active Workers</h3><p>230 workers on duty.</p></div>
+        <div class="card"><h3>Leave Requests</h3><p>12 pending leave applications.</p></div>
+        <div class="card"><h3>Top Performer</h3><p>Worker B completed 40 tasks this month.</p></div>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div id="analytics" class="section">
+      <h1>Analytics</h1>
+      <div class="cards">
+        <div class="card"><h3>Waste Segregation Trend</h3><canvas id="analyticsChart"></canvas></div>
+        <div class="card"><h3>Ward Performance</h3><canvas id="wardChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Training -->
+    <div id="training" class="section">
+      <h1>Training & Awareness</h1>
+      <div class="cards">
+        <div class="card"><h3>Active Courses</h3><p>Waste Segregation 101, Hazardous Handling, Eco-Citizen Guide.</p></div>
+        <div class="card"><h3>Workers Trained</h3><p>145 workers completed mandatory training.</p></div>
+        <div class="card"><h3>Citizen Participation</h3><p>320 citizens enrolled in eco-training.</p></div>
+      </div>
+    </div>
+
+    <!-- Marketplace -->
+    <div id="marketplace" class="section">
+      <h1>Eco Marketplace</h1>
+      <div class="cards">
+        <div class="card"><h3>Redeem Coupons</h3><p>EcoBins, Compost Kits, Reusable Bags available.</p></div>
+        <div class="card"><h3>Discount Stats</h3><p>450 coupons redeemed this month.</p></div>
+        <div class="card"><h3>Business Partners</h3><p>12 eco-friendly suppliers onboard.</p></div>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div id="leaderboard" class="section">
+      <h1>Municipality Leaderboard</h1>
+      <div class="cards">
+        <div class="card"><h3>Top Performing Ward</h3><p>Ward 5 – 98% cleanliness compliance.</p></div>
+        <div class="card"><h3>Lowest Performing Ward</h3><p>Ward 11 – 60% compliance, needs attention.</p></div>
+      </div>
+    </div>
+
+    <!-- Verification -->
+    <div id="verification" class="section">
+      <h1>Ward & Municipality Verification</h1>
+      <div class="verification">
+        <table>
+          <thead>
+            <tr><th>Municipality</th><th>Ward No.</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>South Zone Municipality</td><td>12</td><td>Pending</td><td><button onclick="verify(this)">Verify</button></td></tr>
+            <tr><td>North Zone Municipality</td><td>8</td><td>Pending</td><td><button onclick="verify(this)">Verify</button></td></tr>
+            <tr><td>East Zone Municipality</td><td>4</td><td>Pending</td><td><button onclick="verify(this)">Verify</button></td></tr>
+            <tr><td>West Zone Municipality</td><td>9</td><td>Pending</td><td><button onclick="verify(this)">Verify</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settings" class="section">
+      <h1>Settings & Security</h1>
+      <div class="cards">
+        <div class="card"><h3>Role Management</h3><p>Assign/revoke roles for citizens, workers, community heads.</p></div>
+        <div class="card"><h3>Audit Logs</h3><p>Track admin actions and system changes.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Section toggle
+    function showSection(id){
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // Charts
+    new Chart(document.getElementById('complaintChart').getContext('2d'), {
+      type: 'doughnut',
+      data: { labels: ['Resolved','Pending','Escalated'], datasets: [{ data:[120,45,15], backgroundColor:['#00b894','#fdcb6e','#d63031'] }] },
+      options:{ responsive:true, animation:{ animateScale:true }}
+    });
+
+    new Chart(document.getElementById('workerChart').getContext('2d'), {
+      type: 'bar',
+      data: { labels: ['Worker A','Worker B','Worker C','Worker D'], datasets: [{ label:'Tasks Completed', data:[30,25,40,20], backgroundColor:'#0984e3' }] },
+      options:{ responsive:true, animation:{ duration:2000 }}
+    });
+
+    new Chart(document.getElementById('analyticsChart').getContext('2d'), {
+      type: 'line',
+      data: { labels:['Jan','Feb','Mar','Apr','May'], datasets:[{ label:'Segregation %', data:[65,70,75,80,85], borderColor:'#00cec9', fill:false }] },
+      options:{ responsive:true }
+    });
+
+    new Chart(document.getElementById('wardChart').getContext('2d'), {
+      type: 'bar',
+      data: { labels:['Ward 1','Ward 2','Ward 3','Ward 4'], datasets:[{ label:'Performance %', data:[85,90,78,88], backgroundColor:'#6c5ce7' }] },
+      options:{ responsive:true }
+    });
+
+    // Leaflet Map
+    const map = L.map('map').setView([22.5726, 88.3639], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.marker([22.5726,88.3639]).addTo(map).bindPopup("Kolkata HQ");
+
+    // Verification action
+    function verify(btn){ btn.parentElement.previousElementSibling.textContent = "Verified"; btn.style.display = "none"; }
+  </script>
+</body>
+</html>

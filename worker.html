@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoEvolution - Worker Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1a202c;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header */
+    .header {
+      background-color: #2d3748;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #4a5568;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #10b981;
+    }
+
+    .nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .nav-item {
+      color: #a0aec0;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: #10b981;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 3rem 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .panel-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .panel-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #10b981;
+    }
+
+    /* Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background-color: #2d3748;
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      border: 1px solid #4a5568;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #10b981;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    .card-description {
+      color: #a0aec0;
+      font-size: 0.95rem;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: #2d3748;
+      padding: 2rem;
+      border-radius: 1rem;
+      width: 90%;
+      max-width: 600px;
+      text-align: left;
+      border: 1px solid #4a5568;
+      position: relative;
+    }
+
+    .modal h2 {
+      color: #10b981;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .modal button, .modal input {
+      margin-top: 0.5rem;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      font-size: 0.95rem;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #a0aec0;
+    }
+
+    .action-btn {
+      background: #10b981;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background: #0d8f6d;
+    }
+
+    .cancel-btn {
+      background: #4a5568;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover {
+      background: #2d3748;
+    }
+
+    .task-box, .attendance-log, .resource-list {
+      background: #1f2937;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #4a5568;
+    }
+
+    .attendance-log p {
+      margin: 0.3rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">🌱 EcoEvolution</div>
+    <nav class="nav">
+      <a href="training.html" class="nav-item">Training</a>
+      <a href="marketplace.html" class="nav-item">Marketplace</a>
+      <a href="leaderboard.html" class="nav-item">Leaderboard</a>
+      <a href="#" class="nav-item active">Worker</a>
+    </nav>
+  </header>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="panel-header">
+      <h1 class="panel-title">Worker Panel</h1>
+      <p>Receive assignments, update collection status, and access safety resources.</p>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card" onclick="openModal('taskModal')">
+        <div class="card-icon">💻</div>
+        <h3 class="card-title">Task Dashboard</h3>
+        <p class="card-description">Accept or schedule your tasks.</p>
+      </div>
+
+      <div class="card" onclick="openModal('attendanceModal')">
+        <div class="card-icon">📅</div>
+        <h3 class="card-title">Attendance Manager</h3>
+        <p class="card-description">Mark your daily attendance.</p>
+      </div>
+
+      <div class="card" onclick="openModal('resourceModal')">
+        <div class="card-icon">📋</div>
+        <h3 class="card-title">Resource Request</h3>
+        <p class="card-description">Request necessary safety items.</p>
+      </div>
+
+      <div class="card">
+        <a href="marketplace.html" style="color:white;text-decoration:none;">
+          <div class="card-icon">🎁</div>
+          <h3 class="card-title">Redeem Points</h3>
+          <p class="card-description">Go to Marketplace</p>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Task Modal -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('taskModal')">&times;</span>
+      <h2>Task Dashboard</h2>
+
+      <div class="task-box">
+        <p><b>Task:</b> Clean waste at Ward 12, Street 5</p>
+        <button class="action-btn">Accept Task</button>
+        <p>Or schedule:</p>
+        <input type="date">
+      </div>
+
+      <div class="task-box">
+        <p><b>Task:</b> Collect garbage bins at Ward 8, Market Area</p>
+        <button class="action-btn">Accept Task</button>
+        <p>Or schedule:</p>
+        <input type="date">
+      </div>
+
+      <div class="task-box">
+        <p><b>Task:</b> Sweep public park in Ward 3</p>
+        <button class="action-btn">Accept Task</button>
+        <p>Or schedule:</p>
+        <input type="date">
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Modal -->
+  <div id="attendanceModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('attendanceModal')">&times;</span>
+      <h2>Attendance Manager</h2>
+
+      <div class="attendance-log">
+        <p><b>Today:</b></p>
+        <button class="action-btn">Mark Present</button>
+        <button class="cancel-btn">Mark Absent</button>
+      </div>
+
+      <div class="attendance-log">
+        <p><b>Last 3 days:</b></p>
+        <p>09 Sep → Present</p>
+        <p>08 Sep → Absent</p>
+        <p>07 Sep → Present</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resource Request Modal -->
+  <div id="resourceModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('resourceModal')">&times;</span>
+      <h2>Resource Request</h2>
+      <div class="resource-list">
+        <label><input type="checkbox"> Gloves</label><br>
+        <label><input type="checkbox"> Garbage Bags</label><br>
+        <label><input type="checkbox"> Safety Mask</label><br>
+        <label><input type="checkbox"> Reflective Jacket</label><br>
+        <label><input type="checkbox"> Disinfectant Spray</label><br>
+      </div>
+      <button class="action-btn" onclick="alert('Request submitted!')">Submit Request</button>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      document.getElementById(id).style.display = "flex";
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+  </script>
+</body>
+</html>

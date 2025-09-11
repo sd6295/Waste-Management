@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government & Deals Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Dark greenish-black background */
+            color: #e2e8f0; /* Light gray text for contrast */
+        }
+        .tab-button {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: #2d3748; /* Darker background for active tab */
+            color: #48bb78; /* Greenish-blue for active tab text */
+            border-color: #48bb78;
+        }
+        .tab-button:hover {
+            border-color: #48bb78; /* Greenish-blue on hover */
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border-radius: 0.75rem;
+            background-color: #2d3748; /* Dark card background */
+            border: 1px solid #4a5568; /* Slightly lighter border */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+        .locked-card {
+            background-color: #4a2d37; /* Dark reddish background for locked cards */
+            border-color: #7a3d46; /* Darker red border */
+        }
+        .locked-card .lock-icon {
+            display: inline-block;
+        }
+        .locked-card .card-button {
+            background-color: #5d6874; /* Gray for locked button */
+            cursor: not-allowed;
+            color: #a0aec0; /* Lighter gray text for disabled button */
+        }
+        .card-button {
+            transition: background-color 0.3s ease-in-out;
+            border-radius: 9999px;
+            font-weight: 700;
+            color: #e2e8f0; /* Light text for buttons */
+        }
+        .redeemed-card {
+            background-color: #2d4837; /* Darker green background for redeemed */
+            border-color: #48bb78; /* Green border */
+        }
+        .redeemed-card .redeemed-status {
+            color: #48bb78; /* Green text for status */
+            font-weight: 600;
+            border-color: #48bb78;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-5xl mx-auto bg-gray-800 rounded-xl shadow-lg p-6 md:p-8">
+        <h1 class="text-3xl font-bold text-gray-100 mb-6 text-center">Marketplace</h1>
+
+        <div class="bg-blue-800 text-blue-300 px-6 py-3 rounded-lg text-center font-medium mb-6">
+            <p>Your current level: <span class="font-bold">Bronze</span></p>
+            <p>Points: <span class="font-bold">250</span></p>
+        </div>
+
+        <div class="flex flex-wrap justify-center mb-6 border-b-2 border-gray-700">
+            <button class="tab-button active px-4 py-2 text-sm md:text-base font-semibold text-gray-400 rounded-t-lg border-b-4 border-transparent hover:border-green-500" data-tab="government">Government</button>
+            <button class="tab-button px-4 py-2 text-sm md:text-base font-semibold text-gray-400 rounded-t-lg border-b-4 border-transparent hover:border-green-500" data-tab="local">Local Body</button>
+            <button class="tab-button px-4 py-2 text-sm md:text-base font-semibold text-gray-400 rounded-t-lg border-b-4 border-transparent hover:border-green-500" data-tab="community">Community Exclusive</button>
+            <button class="tab-button px-4 py-2 text-sm md:text-base font-semibold text-gray-400 rounded-t-lg border-b-4 border-transparent hover:border-green-500" data-tab="deals">Top Brand Deals</button>
+            <button class="tab-button px-4 py-2 text-sm md:text-base font-semibold text-gray-400 rounded-t-lg border-b-4 border-transparent hover:border-green-500" data-tab="redeemed">My Redeemed Coupons</button>
+        </div>
+
+        <div id="government" class="tab-content active bg-gray-900 p-6 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-gray-200 mb-4">Government Services & Initiatives</h2>
+            <p class="text-gray-400 mb-6">
+                Explore key services and financial benefits offered by the government.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Income Tax Benefits</h3>
+                    <p class="text-gray-400 mb-4">
+                        This benefit is *composed* of various deductions and rebates for your investments and savings. It *doesn't* require complex paperwork for simple claims.
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Redeem Benefit
+                    </button>
+                </div>
+                <div class="card p-6 shadow-md locked-card">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Property Tax Rebate 
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5 ml-1 text-red-400 lock-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </h3>
+                    <p class="text-gray-400 mb-4">
+                        A special 15% rebate on property taxes for certified users.
+                    </p>
+                    <button class="card-button w-full text-white py-2 px-4">
+                        Unlocked for Platinum Tier
+                    </button>
+                </div>
+                 <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Dustbin Rebate</h3>
+                    <p class="text-gray-400 mb-4">
+                        Receive a flat 20% rebate on your next public dustbin purchase to encourage cleanliness.
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Redeem Benefit
+                    </button>
+                </div>
+                <div class="card p-6 shadow-md locked-card">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Compost Kit Discount
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5 ml-1 text-red-400 lock-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </h3>
+                    <p class="text-gray-400 mb-4">
+                        Get 100% off on a government-approved compost kit.
+                    </p>
+                    <button class="card-button w-full text-white py-2 px-4">
+                        Unlocked for Gold Tier
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="local" class="tab-content bg-gray-900 p-6 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-gray-200 mb-4">Local Body News & Events</h2>
+            <p class="text-gray-400 mb-6">
+                Support your community and get great deals from local businesses.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Gym Membership</h3>
+                    <p class="text-gray-400 mb-4">
+                        Get a 15% discount on all annual memberships at 'Your Local Gym'.
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Redeem
+                    </button>
+                </div>
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Grocery Store Offer</h3>
+                    <p class="text-gray-400 mb-4">
+                        'Family Kirana Store' is offering 10% off on all items for the month of July.
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Redeem
+                    </button>
+                </div>
+                <div class="card p-6 shadow-md locked-card">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Local Cafe Deal
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5 ml-1 text-red-400 lock-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </h3>
+                    <p class="text-gray-400 mb-4">
+                        Buy one coffee, get one free at 'The Daily Grind'. Valid every weekday.
+                    </p>
+                    <button class="card-button w-full text-white py-2 px-4">
+                        Unlocked for Gold Tier
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="community" class="tab-content bg-gray-900 p-6 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-gray-200 mb-4">Community Exclusive Content</h2>
+            <p class="text-gray-400 mb-6">
+                Discover exclusive content and programs available to our registered members. Certain benefits are unlocked based on your membership level.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card p-4 shadow-md text-center">
+                    <p class="text-sm font-semibold text-gray-500">COUPON</p>
+                    <h4 class="text-2xl font-bold text-green-500 my-2">BOOKLOVE</h4>
+                    <p class="text-gray-400 text-sm">Free E-book from our exclusive collection.</p>
+                    <button class="card-button w-full mt-4 bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Redeem
+                    </button>
+                </div>
+                <div class="card p-4 shadow-md text-center">
+                    <p class="text-sm font-semibold text-gray-500">COUPON</p>
+                    <h4 class="text-2xl font-bold text-green-500 my-2">READ20</h4>
+                    <p class="text-gray-400 text-sm">20% off on any book subscription service.</p>
+                    <button class="card-button w-full mt-4 bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Redeem
+                    </button>
+                </div>
+                <div class="card p-4 shadow-md locked-card text-center">
+                    <p class="text-sm font-semibold text-gray-500">COUPON</p>
+                    <h4 class="text-2xl font-bold text-red-500 my-2">AUDIO50 
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5 ml-1 text-red-400 lock-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </h4>
+                    <p class="text-gray-400 text-sm">50% off on your first audiobook purchase.</p>
+                    <button class="card-button w-full mt-4 text-white py-2 px-4">
+                        Unlocked for Silver Tier
+                    </button>
+                </div>
+                <div class="card p-4 shadow-md locked-card text-center">
+                    <p class="text-sm font-semibold text-gray-500">COUPON</p>
+                    <h4 class="text-2xl font-bold text-red-500 my-2">NOVEL15
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-5 h-5 ml-1 text-red-400 lock-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </h4>
+                    <p class="text-gray-400 text-sm">15% off on your next novel at 'Bookseller.com'.</p>
+                    <button class="card-button w-full mt-4 text-white py-2 px-4">
+                        Unlocked for Silver Tier
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="deals" class="tab-content bg-gray-900 p-6 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-gray-200 mb-4">Top Brand Deals</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Dominos Discount</h3>
+                    <p class="text-gray-400 mb-4">
+                        Get a flat 30% off on your next order! Use code: PIZZA30.
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Copy Code
+                    </button>
+                </div>
+
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Zomato Special Offer</h3>
+                    <p class="text-gray-400 mb-4">
+                        Free delivery on orders above $100. Limited time offer!
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Claim Offer
+                    </button>
+                </div>
+
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Nike Shoe Sale</h3>
+                    <p class="text-gray-400 mb-4">
+                        Save up to 40% on select running shoes. Limited stock!
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        View Deals
+                    </button>
+                </div>
+
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Amazon Prime Discount</h3>
+                    <p class="text-gray-400 mb-4">
+                        Get a one-month free trial of Amazon Prime. Use this link!
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Redeem Now
+                    </button>
+                </div>
+
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Starbucks Offer</h3>
+                    <p class="text-gray-400 mb-4">
+                        Buy any coffee, get a second one for half price. Valid until August 31st.
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Learn More
+                    </button>
+                </div>
+
+                <div class="card p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Netflix Trial</h3>
+                    <p class="text-gray-400 mb-4">
+                        Get a 3-month subscription for the price of one. New users only.
+                    </p>
+                    <button class="card-button w-full bg-green-600 text-white py-2 px-4 hover:bg-green-700">
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="redeemed" class="tab-content bg-gray-900 p-6 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-gray-200 mb-4">My Redeemed Coupons</h2>
+            <p class="text-gray-400 mb-6">
+                Below are the coupons you have successfully redeemed. You can view their details, but they are no longer active.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6 shadow-md redeemed-card">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Used: Zomato Special Offer</h3>
+                    <p class="text-gray-400 mb-4">
+                        You redeemed this offer on July 15th, 2024. The free delivery benefit was successfully applied to your order.
+                    </p>
+                    <span class="redeemed-status block text-center py-2 px-4 border border-green-500 rounded-full">REDEEMED</span>
+                </div>
+
+                <div class="card p-6 shadow-md redeemed-card">
+                    <h3 class="text-xl font-bold text-gray-100 mb-2">Used: Dominos Discount</h3>
+                    <p class="text-gray-400 mb-4">
+                        The 30% discount was applied to your pizza order on July 12th, 2024.
+                    </p>
+                    <span class="redeemed-status block text-center py-2 px-4 border border-green-500 rounded-full">REDEEMED</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-button');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTabId = tab.getAttribute('data-tab');
+
+                // Remove active class from all tabs
+                tabs.forEach(t => {
+                    t.classList.remove('active', 'border-green-500');
+                    t.classList.add('hover:border-green-500');
+                });
+                contents.forEach(c => c.classList.remove('active'));
+
+                // Add active class to the clicked tab
+                tab.classList.add('active', 'border-green-500');
+                tab.classList.remove('hover:border-green-500');
+
+                // Show the corresponding content
+                document.getElementById(targetTabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
