@@ -43,6 +43,43 @@
       margin-bottom: 2rem;
     }
 
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #4a5568;
+      background: #1f2937;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    
+    .tab-btn:hover {
+      background-color: #374151;
+      transform: translateY(-2px);
+    }
+
+    .tab-btn.active {
+      background: #10b981;
+      border-color: #10b981;
+      color: #fff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     .filters {
       display: flex;
       justify-content: center;
@@ -94,6 +131,68 @@
       font-weight: bold;
       color: #fbbf24;
     }
+
+    .invite-section {
+      margin-top: 2rem;
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid #4a5568;
+    }
+
+    .invite-section h2 {
+      font-size: 1.5rem;
+      color: #10b981;
+      margin-bottom: 0.5rem;
+    }
+    
+    .invite-form {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .invite-form input {
+      flex-grow: 1;
+      max-width: 300px;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #4a5568;
+      background: #1f2937;
+      color: #fff;
+    }
+    
+    .invite-form button {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: #10b981;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .invite-form button:hover {
+      background-color: #0c8a66;
+    }
+    
+    #inviteMessage {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    .green-text {
+        color: #10b981;
+    }
+
+    .red-text {
+        color: #e53e3e;
+    }
+
+    .change-cell {
+        text-align: right;
+    }
   </style>
 </head>
 <body>
@@ -104,68 +203,143 @@
   <div class="leaderboard-container">
     <h1>Leaderboard</h1>
 
-    <div class="filters">
-      <select id="stateSelect">
-        <option value="">Select State</option>
-      </select>
-      <select id="municipalitySelect" disabled>
-        <option value="">Select Municipality</option>
-      </select>
-      <select id="wardSelect" disabled>
-        <option value="">Select Ward</option>
-      </select>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="global">My Area Scoreboard</button>
+      <button class="tab-btn" data-tab="custom">My Custom Leaderboard</button>
     </div>
 
-    <table id="leaderboardTable">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Name</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="3" style="text-align:center;">Select filters to view leaderboard</td></tr>
-      </tbody>
-    </table>
+    <div id="global-tab" class="tab-content active">
+      <div class="filters">
+        <select id="stateSelect">
+          <option value="">Select State</option>
+        </select>
+        <select id="districtSelect" disabled>
+          <option value="">Select District</option>
+        </select>
+        <select id="municipalitySelect" disabled>
+          <option value="">Select Municipality</option>
+        </select>
+      </div>
+
+      <table id="leaderboardTable">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Location</th>
+            <th>Points</th>
+            <th class="change-cell">Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" style="text-align:center;">Select filters to view leaderboard</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="custom-tab" class="tab-content">
+      <table id="customLeaderboardTable">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Points</th>
+            <th class="change-cell">Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" style="text-align:center;">Invite friends to create your custom leaderboard!</td></tr>
+        </tbody>
+      </table>
+
+      <!-- Invite Section -->
+      <div class="invite-section">
+        <h2>Invite Friends to Compete</h2>
+        <p>Challenge others to join your custom leaderboard and see who can earn the most points!</p>
+        <div class="invite-form">
+          <input type="text" id="inviteInput" placeholder="Enter email or username">
+          <button id="inviteBtn">Send Invite</button>
+        </div>
+        <p id="inviteMessage"></p>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Sample leaderboard data
     const leaderboardData = {
       "West Bengal": {
-        "Kolkata": {
-          "Ward 12": [
-            { name: "Team Green", points: 980 },
-            { name: "Clean Champs", points: 860 },
-            { name: "Ward Warriors", points: 720 }
-          ],
-          "Ward 18": [
-            { name: "Eco Squad", points: 900 },
-            { name: "Waste Busters", points: 750 }
+        "Kolkata District": {
+          "Kolkata": [
+            { ward: "Ward 12", points: 980, change: 50 },
+            { ward: "Ward 18", points: 860, change: -20 },
+            { ward: "Ward 22", points: 720, change: 15 },
+            { ward: "Ward 1", points: 900, change: 120 },
+            { ward: "Ward 5", points: 750, change: -10 }
           ]
         },
-        "Howrah": {
-          "Ward 5": [
-            { name: "River Savers", points: 1000 },
-            { name: "Howrah Heroes", points: 870 }
+        "Howrah District": {
+          "Howrah": [
+            { ward: "Ward 5", points: 1000, change: 30 },
+            { ward: "Ward 8", points: 870, change: -5 }
+          ]
+        },
+        "Hooghly District": {
+          "Chinsurah": [
+            { ward: "Ward 3", points: 1200, change: 80 },
+            { ward: "Ward 7", points: 1050, change: -40 }
+          ],
+          "Chandannagar": [
+            { ward: "Ward 10", points: 990, change: 25 },
+            { ward: "Ward 15", points: 880, change: -10 }
+          ],
+          "Uttarpara": [
+            { ward: "Ward 1", points: 1150, change: 60 },
+            { ward: "Ward 2", points: 1020, change: 10 }
+          ],
+          "Rishra": [
+            { ward: "Ward 5", points: 950, change: 5 },
+            { ward: "Ward 6", points: 890, change: -15 }
           ]
         }
       },
       "Maharashtra": {
-        "Mumbai": {
-          "Ward A": [
-            { name: "Mumbai Recyclers", points: 1100 },
-            { name: "Eco Mumbai", points: 950 }
+        "Mumbai Suburban District": {
+          "Mumbai": [
+            { ward: "Ward A", points: 1100, change: 40 },
+            { ward: "Ward B", points: 950, change: -25 }
           ]
         }
       }
     };
+    
+    let customLeaderboardData = [];
 
     const stateSelect = document.getElementById("stateSelect");
+    const districtSelect = document.getElementById("districtSelect");
     const municipalitySelect = document.getElementById("municipalitySelect");
-    const wardSelect = document.getElementById("wardSelect");
     const leaderboardTable = document.getElementById("leaderboardTable").querySelector("tbody");
+    const leaderboardTableHeader = document.getElementById("leaderboardTable").querySelector("thead tr");
+    const customLeaderboardTable = document.getElementById("customLeaderboardTable").querySelector("tbody");
+    
+    const inviteInput = document.getElementById('inviteInput');
+    const inviteBtn = document.getElementById('inviteBtn');
+    const inviteMessage = document.getElementById('inviteMessage');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Tab switching logic
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        const tabId = btn.dataset.tab;
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
+    });
 
     // Populate states
     for (let state in leaderboardData) {
@@ -174,60 +348,152 @@
       option.textContent = state;
       stateSelect.appendChild(option);
     }
+    
+    function resetLeaderboard() {
+      leaderboardTable.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Select filters to view leaderboard</td></tr>";
+      leaderboardTableHeader.innerHTML = `
+        <th>Rank</th>
+        <th>Location</th>
+        <th>Points</th>
+        <th class="change-cell">Change</th>
+      `;
+    }
 
     stateSelect.addEventListener("change", () => {
+      districtSelect.innerHTML = "<option value=''>Select District</option>";
       municipalitySelect.innerHTML = "<option value=''>Select Municipality</option>";
-      wardSelect.innerHTML = "<option value=''>Select Ward</option>";
-      leaderboardTable.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Select filters to view leaderboard</td></tr>";
+      resetLeaderboard();
 
       if (stateSelect.value) {
+        districtSelect.disabled = false;
+        const districts = leaderboardData[stateSelect.value];
+        for (let district in districts) {
+          const option = document.createElement("option");
+          option.value = district;
+          option.textContent = district;
+          districtSelect.appendChild(option);
+        }
+      } else {
+        districtSelect.disabled = true;
+        municipalitySelect.disabled = true;
+      }
+    });
+
+    districtSelect.addEventListener("change", () => {
+      municipalitySelect.innerHTML = "<option value=''>Select Municipality</option>";
+      leaderboardTable.innerHTML = "";
+      
+      const districtValue = districtSelect.value;
+      
+      if (districtValue) {
         municipalitySelect.disabled = false;
-        const municipalities = leaderboardData[stateSelect.value];
-        for (let muni in municipalities) {
+        
+        const municipalitiesData = leaderboardData[stateSelect.value][districtValue];
+        let municipalitiesWithTotalPoints = [];
+        
+        for (const muni in municipalitiesData) {
           const option = document.createElement("option");
           option.value = muni;
           option.textContent = muni;
           municipalitySelect.appendChild(option);
+          
+          let totalPoints = municipalitiesData[muni].reduce((sum, ward) => sum + ward.points, 0);
+          let totalChange = municipalitiesData[muni].reduce((sum, ward) => sum + ward.change, 0);
+          municipalitiesWithTotalPoints.push({ name: muni, points: totalPoints, change: totalChange });
         }
+
+        municipalitiesWithTotalPoints.sort((a, b) => b.points - a.points);
+        
+        leaderboardTableHeader.innerHTML = `
+          <th>Rank</th>
+          <th>Municipality</th>
+          <th>Points</th>
+          <th class="change-cell">Change</th>
+        `;
+
+        municipalitiesWithTotalPoints.forEach((entry, index) => {
+          const row = document.createElement("tr");
+          const changeClass = entry.change >= 0 ? 'green-text' : 'red-text';
+          row.innerHTML = `
+            <td class="rank">#${index + 1}</td>
+            <td>${entry.name}</td>
+            <td class="points">${entry.points}</td>
+            <td class="change-cell"><span class="${changeClass}">${entry.change > 0 ? '+' : ''}${entry.change}</span></td>
+          `;
+          leaderboardTable.appendChild(row);
+        });
       } else {
-        municipalitySelect.disabled = true;
-        wardSelect.disabled = true;
+          municipalitySelect.disabled = true;
+          resetLeaderboard();
       }
     });
 
     municipalitySelect.addEventListener("change", () => {
-      wardSelect.innerHTML = "<option value=''>Select Ward</option>";
-      leaderboardTable.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Select filters to view leaderboard</td></tr>";
+      leaderboardTable.innerHTML = "";
+      const municipalityValue = municipalitySelect.value;
+      
+      if (municipalityValue) {
+        const wards = leaderboardData[stateSelect.value][districtSelect.value][municipalityValue];
+        
+        wards.sort((a, b) => b.points - a.points);
+        
+        leaderboardTableHeader.innerHTML = `
+          <th>Rank</th>
+          <th>Ward</th>
+          <th>Points</th>
+          <th class="change-cell">Change</th>
+        `;
 
-      if (municipalitySelect.value) {
-        wardSelect.disabled = false;
-        const wards = leaderboardData[stateSelect.value][municipalitySelect.value];
-        for (let ward in wards) {
-          const option = document.createElement("option");
-          option.value = ward;
-          option.textContent = ward;
-          wardSelect.appendChild(option);
-        }
+        wards.forEach((entry, index) => {
+          const row = document.createElement("tr");
+          const changeClass = entry.change >= 0 ? 'green-text' : 'red-text';
+          row.innerHTML = `
+            <td class="rank">#${index + 1}</td>
+            <td>${entry.ward}</td>
+            <td class="points">${entry.points}</td>
+            <td class="change-cell"><span class="${changeClass}">${entry.change > 0 ? '+' : ''}${entry.change}</span></td>
+          `;
+          leaderboardTable.appendChild(row);
+        });
       } else {
-        wardSelect.disabled = true;
+          districtSelect.dispatchEvent(new Event('change'));
       }
     });
-
-    wardSelect.addEventListener("change", () => {
-      if (wardSelect.value) {
-        const leaderboard = leaderboardData[stateSelect.value][municipalitySelect.value][wardSelect.value];
-        leaderboardTable.innerHTML = "";
-        leaderboard
-          .sort((a, b) => b.points - a.points)
-          .forEach((entry, index) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td class="rank">#${index + 1}</td>
-              <td>${entry.name}</td>
-              <td class="points">${entry.points}</td>
-            `;
-            leaderboardTable.appendChild(row);
-          });
+    
+    const renderCustomLeaderboard = () => {
+      customLeaderboardTable.innerHTML = "";
+      if (customLeaderboardData.length === 0) {
+        customLeaderboardTable.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Invite friends to create your custom leaderboard!</td></tr>";
+      } else {
+        customLeaderboardData.sort((a, b) => b.points - a.points);
+        customLeaderboardData.forEach((entry, index) => {
+          const row = document.createElement("tr");
+          const changeClass = entry.change >= 0 ? 'green-text' : 'red-text';
+          row.innerHTML = `
+            <td class="rank">#${index + 1}</td>
+            <td>${entry.name}</td>
+            <td class="points">${entry.points}</td>
+            <td class="change-cell"><span class="${changeClass}">${entry.change > 0 ? '+' : ''}${entry.change}</span></td>
+          `;
+          customLeaderboardTable.appendChild(row);
+        });
+      }
+    };
+    
+    inviteBtn.addEventListener('click', () => {
+      const invitee = inviteInput.value.trim();
+      if (invitee) {
+        const randomPoints = Math.floor(Math.random() * 1000) + 100;
+        const randomChange = Math.floor(Math.random() * 100) - 50;
+        customLeaderboardData.push({ name: invitee, points: randomPoints, change: randomChange });
+        renderCustomLeaderboard();
+        
+        inviteMessage.textContent = `Invitation sent to ${invitee}! Check your leaderboard.`;
+        inviteMessage.style.color = '#10b981';
+        inviteInput.value = '';
+      } else {
+        inviteMessage.textContent = 'Please enter a name or email.';
+        inviteMessage.style.color = '#e53e3e';
       }
     });
   </script>
